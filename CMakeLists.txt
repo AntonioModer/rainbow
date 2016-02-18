@@ -8,16 +8,19 @@ set(THIRD_PARTY ${PROJECT_SOURCE_DIR}/src/ThirdParty)
 
 include(${LOCAL_MODULE_PATH}/Utilities.cmake)
 
-#option(PROFILING   "Compile with profiling" OFF)
-option(UNIT_TESTS  "Compile unit tests" OFF)
+# Scripting languages
+set(SCRIPTING "Lua" CACHE STRING "Scripting language of choice")
+set_property(CACHE SCRIPTING PROPERTY STRINGS "C++" "CSharp" "Lua")
 
 # Features
 option(USE_FMOD_STUDIO  "Enable FMOD Studio audio engine" OFF)
 option(USE_HEIMDALL     "Enable Heimdall debugging facilities" OFF)
-option(USE_LUA_SCRIPT   "Enable Lua scripting" ON)
 option(USE_PHYSICS      "Enable physics module (Box2D)" OFF)
 option(USE_SPINE        "Enable Spine runtime" OFF)
 option(USE_VECTOR       "Enable vector drawing library (NanoVG)" OFF)
+
+#option(PROFILING   "Compile with profiling" OFF)
+option(UNIT_TESTS  "Compile unit tests" OFF)
 
 # Auto-generate files
 execute_process(COMMAND tools/shaders-gen.py WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
@@ -146,7 +149,25 @@ set(SOURCE_FILES
     src/ThirdParty/NanoSVG/NanoSVG.cpp
     src/ThirdParty/NanoSVG/NanoSVG.h)
 
-if(USE_LUA_SCRIPT)
+string(TOLOWER ${SCRIPTING} SCRIPTING_LANG)
+
+if(SCRIPTING_LANG STREQUAL "csharp")
+  add_definitions(-DUSE_LUA_SCRIPT=0)
+  list(APPEND SOURCE_FILES
+       src/DotNet/Core.cpp
+       src/DotNet/Core.h
+       src/DotNet/CoreScript.cpp
+       src/DotNet/CoreScript.h
+       src/DotNet/SharedLibrary.cpp
+       src/DotNet/SharedLibrary.h)
+elseif(SCRIPTING_LANG STREQUAL "c++")
+  add_definitions(-DUSE_LUA_SCRIPT=0)
+  list(APPEND SOURCE_FILES
+       src/Resources/Rainbow.svg.h
+       src/Script/NoGame.cpp
+       src/Script/NoGame.h)
+else()
+  set(SCRIPTING_LANG "lua")
   add_definitions(-DUSE_LUA_SCRIPT=1)
   list(APPEND SOURCE_FILES
        src/Lua/lua_Animation.cpp
@@ -184,12 +205,6 @@ if(USE_LUA_SCRIPT)
        src/Lua/LuaScript.cpp
        src/Lua/LuaScript.h
        src/Resources/Rainbow.lua.h)
-else()
-  add_definitions(-DUSE_LUA_SCRIPT=0)
-  list(APPEND SOURCE_FILES
-       src/Resources/Rainbow.svg.h
-       src/Script/NoGame.cpp
-       src/Script/NoGame.h)
 endif()
 
 if(ANDROID)
@@ -325,7 +340,7 @@ if(USE_PHYSICS)
        src/ThirdParty/Box2D/DebugDraw.h
        src/ThirdParty/Box2D/StableWorld.cpp
        src/ThirdParty/Box2D/StableWorld.h)
-  if(USE_LUA_SCRIPT)
+  if(SCRIPTING_LANG STREQUAL "lua")
     list(APPEND SOURCE_FILES
          src/ThirdParty/Box2D/Lua/Box2D.cpp
          src/ThirdParty/Box2D/Lua/Box2D.h

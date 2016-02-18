@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 
 #ifdef RAINBOW_OS_WINDOWS
+#   include <Windows.h>
 #   include <direct.h>
 #   define S_IRWXU 0000700
 #   define S_IRWXG 0000070
@@ -40,6 +41,7 @@ extern ANativeActivity* g_native_activity;
 namespace
 {
     Path g_current_path;
+    Path g_executable_path;
     Path g_user_data_path;
 
 #ifdef RAINBOW_OS_WINDOWS
@@ -128,6 +130,11 @@ const char* Path::current()
     return g_current_path;
 }
 
+const char* Path::executable_path()
+{
+    return g_executable_path;
+}
+
 void Path::set_current()
 {
 #ifdef RAINBOW_OS_ANDROID
@@ -149,6 +156,18 @@ void Path::set_current(const char* path)
 {
     g_current_path = path;
     set_current();
+}
+
+void Path::set_executable_path(const char* path)
+{
+#ifdef RAINBOW_OS_WINDOWS
+    char absolute_path[MAX_PATH];
+    GetFullPathName(path, MAX_PATH, absolute_path, nullptr);
+#else
+    char absolute_path[PATH_MAX];
+    realpath(path, absolute_path);
+#endif
+    g_executable_path = absolute_path;
 }
 
 Path::Path()

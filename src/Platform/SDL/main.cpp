@@ -76,6 +76,7 @@ int main()
 
 int main(int argc, char* argv[])
 {
+    Path::set_executable_path(argv[0]);
     if (argc < 2)
         Path::set_current();
     else

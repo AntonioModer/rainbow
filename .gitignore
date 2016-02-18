@@ -1,7 +1,10 @@
 # Generated files
 *.swp
+*.xproj*
 .DS_Store
+.vs/
 Rainbow.sublime-workspace
+project.lock.json
 project.xcworkspace/
 src/.ycm_extra_conf.pyc
 xcuserdata/

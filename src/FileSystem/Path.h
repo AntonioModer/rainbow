@@ -22,8 +22,11 @@ public:
 
     static const char* basename(const char* path);
     static const char* current();
+    static const char* executable_path();
+
     static void set_current();
     static void set_current(const char* path);
+    static void set_executable_path(const char* path);
 
     Path();
     explicit Path(const char* file, RelativeTo rel = RelativeTo::CurrentPath);

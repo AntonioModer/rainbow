@@ -10,6 +10,8 @@
 
 #ifndef _MSC_VER
 #   include <experimental/string_view>
+#else
+#   include <string>
 #endif  // _MSC_VER
 
 namespace rainbow
@@ -22,6 +24,8 @@ namespace rainbow
         string_view(const char* str) : data_(str), length_(strlen(str)) {}
         string_view(const char* str, size_t length)
             : data_(str), length_(length) {}
+        string_view(const std::string& str)
+            : data_(str.data()), length_(str.length()) {}
 
         auto data() const { return data_; }
         auto length() const { return length_; }
